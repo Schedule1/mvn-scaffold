@@ -1,0 +1,338 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>com.datapassports.schedule1</groupId>
+  <artifactId>scaffold</artifactId>
+  <version>1.0-SNAPSHOT</version>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    <java.version>1.8</java.version>
+
+    <scala.version>2.11.12</scala.version>
+    <scala.binary.version>2.11</scala.binary.version>
+
+    <assembly.jar.dir>scala-${scala.binary.version}</assembly.jar.dir>
+    <assembly.jar.basename>${project.artifactId}-${project.version}.jar</assembly.jar.basename>
+    <staging.jar.basename>${assembly.jar.basename}</staging.jar.basename>
+    <assembly.file>src/main/assembly/assembly.xml</assembly.file>
+
+    <bouncycastle.version>1.58</bouncycastle.version>
+    <!--<scala.fallback.version>2.10</scala.fallback.version>-->
+
+  </properties>
+
+  <dependencies>
+    <!--<dependency>-->
+    <!--<groupId>com.schedule1.datapassports</groupId>-->
+    <!--<artifactId>datapassports-core</artifactId>-->
+    <!--<version>1.5.0-SNAPSHOT</version>-->
+    <!--</dependency>-->
+
+    <dependency>
+      <groupId>org.scala-lang</groupId>
+      <artifactId>scala-compiler</artifactId>
+      <version>${scala.version}</version>
+      <!--<scope>provided</scope>-->
+    </dependency>
+    <dependency>
+      <groupId>org.scala-lang</groupId>
+      <artifactId>scala-library</artifactId>
+      <version>${scala.version}</version>
+      <!--<scope>provided</scope>-->
+    </dependency>
+    <dependency>
+      <groupId>org.scala-lang</groupId>
+      <artifactId>scala-reflect</artifactId>
+      <version>${scala.version}</version>
+      <!--<scope>provided</scope>-->
+    </dependency>
+
+    <dependency>
+      <groupId>org.scalatest</groupId>
+      <artifactId>scalatest_${scala.binary.version}</artifactId>
+      <version>3.0.4</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>io.monix</groupId>
+      <artifactId>monix_${scala.binary.version}</artifactId>
+      <version>2.3.3</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.bouncycastle</groupId>
+      <artifactId>bcmail-jdk15on</artifactId>
+      <version>${bouncycastle.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.bouncycastle</groupId>
+      <artifactId>bcpkix-jdk15on</artifactId>
+      <version>${bouncycastle.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.bouncycastle</groupId>
+      <artifactId>bcprov-jdk15on</artifactId>
+      <version>${bouncycastle.version}</version>
+      <scope>provided</scope>
+    </dependency>
+  </dependencies>
+  <build>
+    <outputDirectory>target/scala/classes</outputDirectory>
+    <testOutputDirectory>target/scala/test-classes</testOutputDirectory>
+
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>exec-maven-plugin</artifactId>
+          <version>1.5.0</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-jar-plugin</artifactId>
+          <version>3.0.2</version>
+        </plugin>
+
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-shade-plugin</artifactId>
+          <version>3.1.0</version>
+
+          <configuration>
+            <outputFile>${project.build.directory}/${assembly.jar.dir}/${staging.jar.basename}</outputFile>
+            <filters>
+              <filter>
+                <artifact>*:*</artifact>
+                <excludes>
+                  <exclude>META-INF/*.SF</exclude>
+                  <exclude>META-INF/*.DSA</exclude>
+                  <exclude>META-INF/*.RSA</exclude>
+                  <!--<exclude>javax/servlet/**</exclude>-->
+                </excludes>
+              </filter>
+            </filters>
+          </configuration>
+
+          <executions>
+            <execution>
+              <phase>package</phase>
+              <goals>
+                <goal>shade</goal>
+              </goals>
+              <configuration>
+                <createDependencyReducedPom>false</createDependencyReducedPom>
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
+
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-install-plugin</artifactId>
+          <version>2.5.2</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-deploy-plugin</artifactId>
+          <version>2.8.2</version>
+        </plugin>
+        <plugin>
+          <groupId>org.sonatype.plugins</groupId>
+          <artifactId>nexus-staging-maven-plugin</artifactId>
+          <version>1.6.6</version>
+        </plugin>
+
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-dependency-plugin</artifactId>
+          <version>3.0.2</version>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+
+    <plugins>
+
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>flatten-maven-plugin</artifactId>
+        <version>1.0.1</version>
+        <executions>
+          <!-- enable flattening -->
+          <execution>
+            <id>flatten</id>
+            <phase>process-resources</phase>
+            <goals>
+              <goal>flatten</goal>
+            </goals>
+          </execution>
+          <!-- ensure proper cleanup -->
+          <execution>
+            <id>flatten.clean</id>
+            <phase>clean</phase>
+            <goals>
+              <goal>clean</goal>
+            </goals>
+          </execution>
+        </executions>
+
+      </plugin>
+
+
+      <plugin>
+        <groupId>net.alchim31.maven</groupId>
+        <artifactId>scala-maven-plugin</artifactId>
+        <version>3.3.1</version>
+        <executions>
+          <execution>
+            <id>scala-compile-first</id>
+            <phase>process-resources</phase>
+            <goals>
+              <goal>compile</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>scala-test-compile-first</id>
+            <phase>process-test-resources</phase>
+            <goals>
+              <goal>testCompile</goal>
+            </goals>
+          </execution>
+          <!--required for publishing to maven central-->
+          <execution>
+            <id>eclipse-add-source</id>
+            <goals>
+              <goal>add-source</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>attach-scaladocs</id>
+            <phase>verify</phase>
+            <goals>
+              <goal>doc-jar</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <scalaVersion>${scala.version}</scalaVersion>
+          <scalaCompatVersion>${scala.binary.version}</scalaCompatVersion>
+          <recompileMode>incremental</recompileMode>
+          <useZincServer>true</useZincServer>
+          <!--https://tpolecat.github.io/2017/04/25/scalac-flags.html-->
+          <args>
+            <arg>-target:jvm-${java.version}</arg>
+            <arg>-unchecked</arg>
+            <arg>-deprecation</arg>
+            <arg>-feature</arg>
+            <arg>-g:vars</arg>
+            <!--<arg>-language:existentials</arg> &lt;!&ndash; often used in project &ndash;&gt;-->
+
+            <arg>-encoding</arg>
+            <arg>UTF-8</arg>
+            <!--<arg>-language:_</arg>-->
+            <!--<arg>-Xfatal-warnings</arg>-->
+            <arg>-Xlint</arg>
+            <!--<arg>-Yno-adapted-args</arg>-->
+            <!--<arg>-Ywarn-dead-code</arg> &lt;!&ndash;,        // N.B. doesn't work well with the ??? hole &ndash;&gt;-->
+            <!--<arg>-Ywarn-numeric-widen</arg>-->
+            <!--<arg>-Ywarn-value-discard</arg>-->
+            <!--<arg>-Xfuture</arg>-->
+            <arg>-Ywarn-unused-import</arg>
+            <!--<arg>-Ypartial-unification</arg>-->
+            <!--<arg>-Ywarn-numeric-widen</arg>        &lt;!&ndash;      // Warn when numerics are widened. &ndash;&gt;-->
+            <!--<arg>-language:higherKinds</arg>-->
+            <!--<arg>-P:wartremover:only-warn-traverser:org.wartremover.warts.Unsafe</arg>-->
+          </args>
+          <!--<jvmArgs>-->
+          <!--<jvmArg>-Xms64m</jvmArg>-->
+          <!--<jvmArg>-Xms1024m</jvmArg>-->
+          <!--<jvmArg>-Xmx1024m</jvmArg>-->
+          <!--</jvmArgs>-->
+          <javacArgs>
+            <javacArg>-source</javacArg>
+            <javacArg>${java.version}</javacArg>
+            <javacArg>-target</javacArg>
+            <javacArg>${java.version}</javacArg>
+          </javacArgs>
+
+          <excludes>
+            <exclude>**/.ipynb_checkpoints/*</exclude>
+          </excludes>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.5.1</version>
+        <configuration>
+          <source>${java.version}</source>
+          <target>${java.version}</target>
+
+          <excludes>
+            <exclude>**/.ipynb_checkpoints/*</exclude>
+          </excludes>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.scalatest</groupId>
+        <artifactId>scalatest-maven-plugin</artifactId>
+        <version>2.0.0</version>
+        <!--<dashL>
+        com.schedule1.datapassports.testutils.Unstable,com.schedule1.datapassports.testutils.LocalOnly,com.schedule1.datapassports.testutils.NeedBlockChain,com.schedule1.datapassports.testutils.NeedOracle,com.schedule1.datapassports.testutils.NeedSQLServer,com.schedule1.datapassports.testutils.NeedMySQL,com.schedule1.datapassports.testutils.NeedKrb
+        </dashL>-->
+        <configuration>
+          <tagsToExclude>
+            com.schedule1.datapassports.testutils.Unstable,
+            com.schedule1.datapassports.testutils.LocalOnly,
+            com.schedule1.datapassports.testutils.NeedBlockChain,
+            com.schedule1.datapassports.testutils.NeedOracle,
+            com.schedule1.datapassports.testutils.NeedSQLServer,
+            com.schedule1.datapassports.testutils.NeedMySQL,
+            com.schedule1.datapassports.testutils.NeedKrb,
+            com.schedule1.datapassports.testutils.NeedRemoteHDFS,
+            com.schedule1.datapassports.testutils.NeedRemoteSSH
+          </tagsToExclude>
+        </configuration>
+        <executions>
+          <execution>
+            <id>test</id>
+            <goals>
+              <goal>test</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+      <!-- Generate test jar too -->
+      <!--from http://stackoverflow.com/questions/15816805/in-a-multi-module-project-can-a-maven-module-access-transitive-test-scoped-depe-->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <executions>
+          <execution>
+            <goals>
+              <goal>test-jar</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+      </plugin>
+    </plugins>
+  </build>
+
+</project>
